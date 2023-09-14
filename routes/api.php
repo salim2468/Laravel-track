@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ExpenseCategoryController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ExpenseController;
@@ -26,4 +27,10 @@ Route::post('/login', [UserController::class,'login']);
 
 Route::apiResource('/expenses', ExpenseController::class);
 Route::get('/users/{id}/expenses', [ExpenseController::class,'allExpenses']);
+
+
+Route::get('/catagory', [ExpenseCategoryController::class,'index']);
+Route::post('/catagory', [ExpenseCategoryController::class,'store']);
+Route::put('/catagory/{id}', [ExpenseCategoryController::class,'update']);
+Route::delete('/catagory', [ExpenseCategoryController::class,'delete']);
 

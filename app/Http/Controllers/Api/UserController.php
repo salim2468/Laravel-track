@@ -45,6 +45,7 @@ class UserController extends Controller
         } else {
             // get authenticated user
             $user = auth()->user();
+            echo ($user);
             if ($user) {
                 $token = $user->createToken("auth_token")->accessToken;
                 return response()->json(

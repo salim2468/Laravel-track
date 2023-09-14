@@ -115,12 +115,19 @@ class ExpenseController extends Controller
      */
     public function allExpenses($id,Request $request)
     {
-        $page = $request->query('page',2);
-        echo $page;
+        $limit = $request->query('limit',2);
+        $category = $request->query('category');
+
         $user = User::find($id);
+        $expenseQuery =  $user->expense()->orderByDesc('created_at');
+        // ->paginate($limit);
+        if($category){
+            $expenseQuery->catagoryName($category);
+        }
+
 
         return response()->json([
-            'data' => $user->expense()->orderByDesc('created_at')->paginate($page)
+            'data' => $expenseQuery->paginate($limit)
         ], 200);
     }
 }
