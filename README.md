@@ -64,3 +64,14 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+
+
+
+Run 
+To run in localhost command 
+    php artisan serve
+    
+To run in ip address
+    php artisan serve --host=192.168.122.1 --port=8000
+        where ip address = 192.168.122.1

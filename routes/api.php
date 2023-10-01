@@ -18,6 +18,8 @@ use App\Http\Controllers\Api\ExpenseController;
 */
 Route::post('/register', [UserController::class,'register']);
 Route::post('/login', [UserController::class,'login']);
+Route::middleware('auth:api')->post('/logout', [UserController::class,'logout']);
+
 
 
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
@@ -25,7 +27,7 @@ Route::post('/login', [UserController::class,'login']);
 // });
 
 
-Route::apiResource('/expenses', ExpenseController::class);
+Route::middleware('auth:api')->apiResource('/expenses', ExpenseController::class);
 Route::get('/users/{id}/expenses', [ExpenseController::class,'allExpenses']);
 
 
