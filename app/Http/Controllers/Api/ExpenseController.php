@@ -36,6 +36,12 @@ class ExpenseController extends Controller
      */
     public function store(Request $request)
     {
+        $validatedData = $request->validate([
+            'category' => 'required',
+            'description' => 'required',
+            'price' =>'required',
+            'user_id' => 'required',
+        ]);
 
         $expense = Expense::create([
             'category' => $request->category,
