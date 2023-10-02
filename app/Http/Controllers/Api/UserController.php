@@ -45,6 +45,7 @@ class UserController extends Controller
         } else {
             // get authenticated user
             $user = auth()->user();
+            echo ($user);
             if ($user) {
                 $token = $user->createToken("auth_token")->accessToken;
                 return response()->json(
@@ -58,4 +59,12 @@ class UserController extends Controller
             }
         }
     }
+
+    public function logout(Request $request){
+        // $request->user()->tokens()->delete();
+        $token = $request->user()->token();
+        $token->delete();
+        return response()->json(['message'=>'Logout successfully'], 200);
+    }
+    
 }
