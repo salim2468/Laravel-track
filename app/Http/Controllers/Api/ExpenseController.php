@@ -85,6 +85,13 @@ class ExpenseController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $validatedData = $request->validate([
+            'category' => 'required',
+            'description' => 'required',
+            'price' =>'required',
+            'user_id' => 'required',
+        ]);
+        
         $expense = Expense::find($id);
         if ($expense) {
             $expense->update([
