@@ -28,11 +28,15 @@ Route::middleware('auth:api')->post('/logout', [UserController::class,'logout'])
 
 
 Route::middleware('auth:api')->apiResource('/expenses', ExpenseController::class);
+//Route::apiResource('/expenses', ExpenseController::class);
+
+
 Route::get('/users/{id}/expenses', [ExpenseController::class,'allExpenses']);
+Route::get('/expenses', [ExpenseController::class,'sortByDate']);
 
 
-Route::get('/catagory', [ExpenseCategoryController::class,'index']);
-Route::post('/catagory', [ExpenseCategoryController::class,'store']);
-Route::put('/catagory/{id}', [ExpenseCategoryController::class,'update']);
-Route::delete('/catagory', [ExpenseCategoryController::class,'delete']);
+Route::get('/expense-category', [ExpenseCategoryController::class,'index']);
+Route::post('/expense-category', [ExpenseCategoryController::class,'store']);
+Route::put('/expense-category/{id}', [ExpenseCategoryController::class,'update']);
+Route::delete('/expense-category', [ExpenseCategoryController::class,'delete']);
 

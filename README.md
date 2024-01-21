@@ -69,9 +69,21 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 
 Run 
-To run in localhost command 
+1. To run in localhost command 
     php artisan serve
-    
-To run in ip address
+
+2. To run in ip address
     php artisan serve --host=192.168.122.1 --port=8000
         where ip address = 192.168.122.1
+
+change baseUrl simlilarly
+    http://192.168.122.1:8000/api/expenses
+
+
+Docker 
+    Run command
+        1. to run
+            docker-compose up -build
+        2. to remove container
+            docker-compose down
+        3. To stop do it form docker ui (dashboard)
