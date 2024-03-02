@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Action\ExpenseCategory\CreateExpenseCategory;
 use Illuminate\Http\Request;
 use App\Models\ExpenseCategory;
-use App\Action\ExpenseCategory\GetExpenseCategory;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Action\ExpenseCategory\GetExpenseCategory;
+use App\Action\ExpenseCategory\CreateExpenseCategory;
+use App\Action\ExpenseCategory\DeleteExpenseCategory;
 
 class ExpenseCategoryController extends Controller
 {
@@ -21,26 +23,19 @@ class ExpenseCategoryController extends Controller
         return $expenseCategory
             ->execute($params, $sort, $order)
             ->paginate($count);
-
-        // $expenseCategory = ExpenseCategory::all();
-        // return response()->json([
-        //     "data" => $expenseCategory,
-        // ],200);
     }
 
     public function store(CreateExpenseCategory $createExpenseCategory)
     {
         $inputs = request()->all();
+        Log::debug(json_encode($inputs));
         $expenseCategory = $createExpenseCategory->execute($inputs);
-        return $expenseCategory;
-
-        // $expenseCategory = ExpenseCategory::create([
-        //     'category_name' => $request->category_name,
-        // ]);
-        // return response()->json([
-        //     'data' => $expenseCategory,
-        //     'message' => 'Sucessfully added new category'
-        // ], 200);
+        if($expenseCategory){
+            return response()->json([
+                'data' => $expenseCategory,
+                'message' => 'Sucessfully added new category'
+            ], 201);
+        }
     }
 
 
@@ -60,14 +55,15 @@ class ExpenseCategoryController extends Controller
         }
     }
 
-    public function destroy(string $id)
+    public function destroy(string $id, DeleteExpenseCategory $deleteExpenseCategory)
     {
         $expenseCategory = ExpenseCategory::find($id);
 
         if (!$expenseCategory) {
             return response()->json(['message' => 'Expense record not found'], 404);
-        }
-        $expenseCategory->delete();
+        }        
+        $deleteExpenseCategory->execute($expenseCategory);
+        
         return response()->json(['message' => 'Expense record deleted successfully'], 204);
     }
 }

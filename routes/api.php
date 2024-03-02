@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\ExpenseController;
 Route::post('/register', [UserController::class,'register']);
 Route::post('/login', [UserController::class,'login']);
 Route::middleware('auth:api')->post('/logout', [UserController::class,'logout']);
+Route::get('/user/{id}', [UserController::class,'show']);
 
 
 
@@ -28,15 +29,15 @@ Route::middleware('auth:api')->post('/logout', [UserController::class,'logout'])
 
 
 Route::middleware('auth:api')->apiResource('/expenses', ExpenseController::class);
-//Route::apiResource('/expenses', ExpenseController::class);
+// Route::apiResource('/expenses', ExpenseController::class);
 
 
-Route::get('/users/{id}/expenses', [ExpenseController::class,'allExpenses']);
-Route::get('/expenses', [ExpenseController::class,'sortByDate']);
+// Route::get('/users/{id}/expenses', [ExpenseController::class,'allExpenses']);
+// Route::get('/expenses', [ExpenseController::class,'index']);
 
 
 Route::get('/expense-category', [ExpenseCategoryController::class,'index']);
 Route::post('/expense-category', [ExpenseCategoryController::class,'store']);
 Route::put('/expense-category/{id}', [ExpenseCategoryController::class,'update']);
-Route::delete('/expense-category', [ExpenseCategoryController::class,'delete']);
+Route::delete('/expense-category/{id}', [ExpenseCategoryController::class,'destroy']);
 
