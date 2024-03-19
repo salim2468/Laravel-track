@@ -6,10 +6,16 @@ namespace App\Http\Controllers\Api;
 use App\Models\Expense;
 use Illuminate\Http\Request;
 use App\Action\Expense\GetExpense;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Action\Expense\CreateExpense;
+
 use App\Action\Expense\DeleteExpense;
 use App\Action\Expense\UpdateExpense;
+use App\Action\Expense\GetTotalExpense;
+use App\Action\Expense\GetMonthlyExpense;
+
 
 class ExpenseController extends Controller
 {
@@ -18,46 +24,28 @@ class ExpenseController extends Controller
      */
     public function index(GetExpense $getExpense)
     {
-        $order = request()->input('order', 'asc');
+        $order = request()->input('order', 'desc');
         $sort = request()->input('sort', 'id');
-        $count = request()->input('count', 10);
+        $count = request()->input('count', 100);
         $params = request()->only(['keyword']);
+        $params = request()->input('date');
         $userId = auth()->user()->id;
         $params['user_id'] = $userId;
 
-        $expenses = $getExpense->execute($params, $sort, $order)->paginate($count);
-        return response(["data"=>$expenses],200);
+        $expenses = $getExpense->execute($params, $sort, $order)->with('expenseCategory')->paginate($count);
+        return response(["data" => $expenses], 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request,CreateExpense $createExpense)
+    public function store(Request $request, CreateExpense $createExpense)
     {
-        // $validatedData = $request->validate([
-        //     'category' => 'required',
-        //     'description' => 'required',
-        //     'price' =>'required',
-        //     'user_id' => 'required',
-        // ]);
         $inputs = request()->all();
+        Log::debug('hhhhhhhh');
+        Log::debug(json_encode($inputs));
         $expense = $createExpense->execute($inputs);
-        
-        // $expense = Expense::create([
-        //     'category' => $request->category,
-        //     'description' => $request->description,
-        //     'price' => $request->price,
-        //     'user_id' => $request->user_id,
-        // ]);
-
         return response()->json([
             'data' => $expense,
             'message' => 'sucessfully added new record'
@@ -75,32 +63,27 @@ class ExpenseController extends Controller
                 'message' => 'sucess',
             ], 200);
         } else {
-            return response()->json(['message' => "record not found"],404);
+            return response()->json(['message' => "record not found"], 404);
         }
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
     }
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Expense $expense, UpdateExpense $updateExpense)
-    {   
+    {
         $inputs = request()->all();
-        $updateExpense->execute($expense, $inputs);
-        return response([]);
+        $reuslt = $updateExpense->execute($expense, $inputs);
+        if ($reuslt) {
+            return response(['message' => 'Sucessfully Updated'], 200);
+        }
+        return response(['error' => 'Something went wrong'], 500);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id,DeleteExpense $deleteExpense)
+    public function destroy(string $id, DeleteExpense $deleteExpense)
     {
         $expense = Expense::find($id);
 
@@ -111,40 +94,36 @@ class ExpenseController extends Controller
         return response()->json(['message' => 'Expense record deleted successfully'], 204);
     }
 
-    public function monthlyExpense(){
-        $inputs['id'] = auth()->user()->id;
+    public function totalExpense(GetTotalExpense $getTotalExpense)
+    {
+        $inputs['user_id'] = auth()->user()->id;
+        $inputs['date'] = request()->input('date', date('Y-m-d'));
+        $expenses = $getTotalExpense->execute($inputs);
+        return response()->json(['total' => $expenses]);
+    }
+    public function latestSixMonthsExpense(GetMonthlyExpense $getMonthlyExpense)
+    {
+        $startDate = now()->subMonths(6)->startOfMonth();
+        $endDate = now()->endOfMonth();
+        
+        $expenses = Expense::select(
+            DB::raw('MONTH(date) as month'),
+            DB::raw('YEAR(date) as year'),
+            DB::raw('SUM(price) as total_price')
+        )
+        ->whereBetween('date', [$startDate, $endDate])
+        ->groupBy(DB::raw('YEAR(date)'), DB::raw('MONTH(date)'))
+        ->orderBy('year', 'asc')
+        ->orderBy('month', 'asc')
+        ->get();
+    
+        return response(['data' => $expenses]);
 
+        // $expenses = Expense::whereBetween('date', [$startDate, $endDate])->groupBy(DB::raw('YEAR(date)'))->get();
+        // return response(['data' => $expenses, 'start' => $startDate, 'end' => $endDate]);
+        // $inputs['user_id'] = auth()->user()->id;
+        // $expenses = $getMonthlyExpense->execute($inputs);
+        // return $expenses;
     }
 
-    /** 
-     * Get all expense records for the specified user
-     */
-    // public function allExpenses($id,Request $request)
-    // {
-    //     $limit = $request->query('limit',2);
-    //     $category = $request->query('category');
-
-    //     $user = User::find($id);
-    //     $expenseQuery =  $user->expense()->orderByDesc('created_at');
-    //     // ->paginate($limit);
-    //     if($category){
-    //         $expenseQuery->catagoryName($category);
-    //     }
-
-
-    //     return response()->json([
-    //         'data' => $expenseQuery->paginate($limit)
-    //     ], 200);
-    // }
-
-    // public function sortByDate(Request $request){
-    //     $date = $request->query('date');
-
-    //     if(!is_null($date)){
-    //         $user = auth()->user();
-    //         if($user){
-    //             // $expense = $user->expense()->where('date',$date);
-    //         }
-    //     } 
-    // }
 }

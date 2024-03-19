@@ -25,6 +25,10 @@ class FilterExpense
         if ($userId = Arr::pull($params, 'userId')) {
             $this->query->whereIn('user_id', $userId);
         }
+        if($date = Arr::pull($params, 'date')) {
+            $yearMonth = substr($date, 0,7);
+            $this->query->where('date','LIKE',"%$yearMonth%");
+        }
         if ($keyword = Arr::pull($params, 'keyword')) {
             $this->query->where(function($query) use($keyword){
                 $query

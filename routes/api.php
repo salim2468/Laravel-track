@@ -21,19 +21,14 @@ Route::post('/login', [UserController::class,'login']);
 Route::middleware('auth:api')->post('/logout', [UserController::class,'logout']);
 Route::get('/user/{id}', [UserController::class,'show']);
 
+Route::middleware('auth:api')->group(function () {
+Route::apiResource('/expenses', ExpenseController::class);
+Route::get('/expenses/{id}/total-expense', [ExpenseController::class,'totalExpense']);
+Route::get('/expenses/{id}/monthly', [ExpenseController::class,'latestSixMonthsExpense']);
 
+});
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
-
-
-Route::middleware('auth:api')->apiResource('/expenses', ExpenseController::class);
 // Route::apiResource('/expenses', ExpenseController::class);
-
-
-// Route::get('/users/{id}/expenses', [ExpenseController::class,'allExpenses']);
-// Route::get('/expenses', [ExpenseController::class,'index']);
 
 
 Route::get('/expense-category', [ExpenseCategoryController::class,'index']);
