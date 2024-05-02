@@ -25,6 +25,7 @@ Route::middleware('auth:api')->group(function () {
 Route::apiResource('/expenses', ExpenseController::class);
 Route::get('/expenses/{id}/total-expense', [ExpenseController::class,'totalExpense']);
 Route::get('/expenses/{id}/monthly', [ExpenseController::class,'latestSixMonthsExpense']);
+Route::get('/expense-by-category', [ExpenseController::class,'getExpenseByCategoryOfCurrentMonth']);
 
 });
 
@@ -36,3 +37,9 @@ Route::post('/expense-category', [ExpenseCategoryController::class,'store']);
 Route::put('/expense-category/{id}', [ExpenseCategoryController::class,'update']);
 Route::delete('/expense-category/{id}', [ExpenseCategoryController::class,'destroy']);
 
+
+
+
+Route::get('/test', function () {
+    return response(['data' => 'test']);
+});

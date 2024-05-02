@@ -14,7 +14,6 @@ use App\Action\Expense\CreateExpense;
 use App\Action\Expense\DeleteExpense;
 use App\Action\Expense\UpdateExpense;
 use App\Action\Expense\GetTotalExpense;
-use App\Action\Expense\GetMonthlyExpense;
 
 
 class ExpenseController extends Controller
@@ -26,7 +25,7 @@ class ExpenseController extends Controller
     {
         $order = request()->input('order', 'desc');
         $sort = request()->input('sort', 'id');
-        $count = request()->input('count', 100);
+        $count = request()->input('count', 10);
         $params = request()->only(['keyword']);
         $params = request()->input('date');
         $userId = auth()->user()->id;
@@ -101,22 +100,24 @@ class ExpenseController extends Controller
         $expenses = $getTotalExpense->execute($inputs);
         return response()->json(['total' => $expenses]);
     }
+    
+/*
     public function latestSixMonthsExpense(GetMonthlyExpense $getMonthlyExpense)
     {
         $startDate = now()->subMonths(6)->startOfMonth();
         $endDate = now()->endOfMonth();
-        
+
         $expenses = Expense::select(
             DB::raw('MONTH(date) as month'),
             DB::raw('YEAR(date) as year'),
             DB::raw('SUM(price) as total_price')
         )
-        ->whereBetween('date', [$startDate, $endDate])
-        ->groupBy(DB::raw('YEAR(date)'), DB::raw('MONTH(date)'))
-        ->orderBy('year', 'asc')
-        ->orderBy('month', 'asc')
-        ->get();
-    
+            ->whereBetween('date', [$startDate, $endDate])
+            ->groupBy(DB::raw('YEAR(date)'), DB::raw('MONTH(date)'))
+            ->orderBy('year', 'asc')
+            ->orderBy('month', 'asc')
+            ->get();
+
         return response(['data' => $expenses]);
 
         // $expenses = Expense::whereBetween('date', [$startDate, $endDate])->groupBy(DB::raw('YEAR(date)'))->get();
@@ -125,5 +126,20 @@ class ExpenseController extends Controller
         // $expenses = $getMonthlyExpense->execute($inputs);
         // return $expenses;
     }
-
+*/
+    public function getExpenseByCategoryOfCurrentMonth()
+    {
+        $result = Expense::select(
+                'expense_categories.category_name as category_name',
+                'expenses.category_id',
+                DB::raw('SUM(expenses.price) as total_price')
+            )
+            ->join('expense_categories', 'expenses.category_id', '=', 'expense_categories.id')
+            ->where('expenses.user_id', 1)
+            ->whereYear('expenses.date', '=', date('Y'))
+            ->whereMonth('expenses.date', '=', date('m'))
+            ->groupBy('expenses.category_id')
+            ->get();
+        return response(['data' => $result]);
+    }
 }
