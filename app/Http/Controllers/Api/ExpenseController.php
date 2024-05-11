@@ -27,8 +27,12 @@ class ExpenseController extends Controller
         $order = request()->input('order', 'desc');
         $sort = request()->input('sort', 'id');
         $count = request()->input('count', 10);
-        $params = request()->only(['keyword']);
-        $params = request()->input('date');
+
+        $params['keyword'] = request()->only(['keyword']);
+        $params['date'] = request()->input('date');
+        $params['startDate'] = request()->input('startDate');
+        $params['endDate'] = request()->input('endDate');
+        
         $userId = auth()->user()->id;
         $params['user_id'] = $userId;
 
