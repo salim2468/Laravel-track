@@ -3,14 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 
+use App\Models\User;
 use App\Models\Expense;
 use Illuminate\Http\Request;
 use App\Action\Expense\GetExpense;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use App\Action\Expense\CreateExpense;
 
+use App\Action\Expense\CreateExpense;
 use App\Action\Expense\DeleteExpense;
 use App\Action\Expense\UpdateExpense;
 use App\Action\Expense\GetTotalExpense;
@@ -72,8 +73,8 @@ class ExpenseController extends Controller
     public function update(Expense $expense, UpdateExpense $updateExpense)
     {
         $inputs = request()->all();
-        $reuslt = $updateExpense->execute($expense, $inputs);
-        if ($reuslt) {
+        $result = $updateExpense->execute($expense, $inputs);
+        if ($result) {
             return response(['message' => 'Sucessfully Updated'], 200);
         }
         return response(['error' => 'Something went wrong'], 500);
@@ -93,15 +94,31 @@ class ExpenseController extends Controller
         return response()->json(['message' => 'Expense record deleted successfully'], 204);
     }
 
+    // old function
+    // public function totalExpense(GetTotalExpense $getTotalExpense)
+    // {
+    //     $inputs['user_id'] = auth()->user()->id;
+    //     $inputs['date'] = request()->input('date', date('Y-m-d'));
+    //     $expenses = $getTotalExpense->execute($inputs);
+    //     return response()->json(['total' => $expenses]);
+    // }
+    // new function
     public function totalExpense(GetTotalExpense $getTotalExpense)
     {
         $inputs['user_id'] = auth()->user()->id;
         $inputs['date'] = request()->input('date', date('Y-m-d'));
         $expenses = $getTotalExpense->execute($inputs);
-        return response()->json(['total' => $expenses]);
+
+        $monthlyIncome = User::find(auth()->user()->id)->value('income');
+
+        return response()->json([
+            'total_expense' => $expenses,
+            'monthly_income' => $monthlyIncome,
+            'remaning_amount' => $monthlyIncome - $expenses
+        ]);
     }
-    
-/*
+
+    /*
     public function latestSixMonthsExpense(GetMonthlyExpense $getMonthlyExpense)
     {
         $startDate = now()->subMonths(6)->startOfMonth();
@@ -130,10 +147,10 @@ class ExpenseController extends Controller
     public function getExpenseByCategoryOfCurrentMonth()
     {
         $result = Expense::select(
-                'expense_categories.category_name as category_name',
-                'expenses.category_id',
-                DB::raw('SUM(expenses.price) as total_price')
-            )
+            'expense_categories.category_name as category_name',
+            'expenses.category_id',
+            DB::raw('SUM(expenses.price) as total_price')
+        )
             ->join('expense_categories', 'expenses.category_id', '=', 'expense_categories.id')
             ->where('expenses.user_id', 1)
             ->whereYear('expenses.date', '=', date('Y'))
