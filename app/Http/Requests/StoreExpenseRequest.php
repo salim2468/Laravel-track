@@ -24,7 +24,7 @@ class StoreExpenseRequest extends FormRequest
         return [
             'category' => 'required',
             'description' => ['required','max:250'],
-            'price' => ['required'],
+            'price' => ['required','min:1'],
             'user_id' => 'required',
         ];
     }
