@@ -11,13 +11,13 @@ class Expense extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['category', 'description', 'price','user_id'];
+    protected $fillable = ['category_id', 'description', 'price', 'date','user_id'];
 
     public function user(){
         return $this->belongsTo(User::class);
     }
     public function expenseCategory(){
-        return $this->belongsTo(ExpenseCategory::class);
+        return $this->belongsTo(ExpenseCategory::class, 'category_id');
     }
 
     public function scopeCategoryName($query,$category)

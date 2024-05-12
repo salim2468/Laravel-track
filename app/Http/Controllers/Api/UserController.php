@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Exception;
 
 class UserController extends Controller
 {
@@ -45,7 +46,6 @@ class UserController extends Controller
         } else {
             // get authenticated user
             $user = auth()->user();
-            echo ($user);
             if ($user) {
                 $token = $user->createToken("auth_token")->accessToken;
                 return response()->json(
@@ -58,6 +58,17 @@ class UserController extends Controller
                 );
             }
         }
+    }
+
+    public function show($id){
+        try{
+            $user = User::findOrFail($id);
+        }catch(Exception $exception){
+            return response(['error'=>$exception->getMessage(),'message'=>'No User found']);
+        } 
+        return response([
+            'data' => $user
+        ],200);
     }
 
     public function logout(Request $request){

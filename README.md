@@ -72,7 +72,7 @@ Run
 1. To run in localhost command 
     php artisan serve
 
-2. To run in ip address
+2. To run in ip address (Axios will not allow localhost to be used for api)
     php artisan serve --host=192.168.122.1 --port=8000
         where ip address = 192.168.122.1
 
@@ -87,3 +87,18 @@ Docker
         2. to remove container
             docker-compose down
         3. To stop do it form docker ui (dashboard)
+
+Docker Terminal 
+    Terminal:
+        1. Run command
+            mysql
+        2. If above will give some root error then run
+            mysql -u root -p
+        3. Then type password i.e
+            password
+        4.  Select database
+            use tack
+        5. if there are no tables then, go to php termminal and run command 
+            php aritsan migrate
+        6. then error related to key will display, run 
+            php artisan passport:install
